@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KENSETSUGATE 建設門 | 改正建設業法・労務費勧告・2024年残業上限 ローカル監査</title>
+  <meta name="description" content="ブラウザ完結・通信ゼロで改正建設業法（第19条書面・標準労務費ダンピング禁止・資材高騰価格協議・一括下請負禁止・特定建設業許可5,000万/8,000万円）と2024年建設業時間外上限を監査します。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Shippori+Mincho:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="page-shell">
+    <header class="masthead" data-ui="masthead">
+      <div class="brand-lockup">
+        <span class="hanko-seal" aria-hidden="true">建設</span>
+        <div>
+          <h1>KENSETSUGATE <span class="title-sub">建設門</span></h1>
+          <p class="subtitle">改正建設業法（標準労務費・価格協議・特定許可5,000万/8,000万）・2024年残業上限 ローカル監査ツール</p>
+        </div>
+      </div>
+      <div class="trust-badges">
+        <span class="trust-pill" data-ui="badge">100% ブラウザローカル計算</span>
+        <span class="trust-pill" data-ui="badge">見積原価・下請条件社外送信ゼロ</span>
+      </div>
+    </header>
+
+    <main class="workspace-grid">
+      <section class="panel input-panel" data-ui="panel">
+        <div class="panel-head">
+          <h2>1. 工事金額・労務費目安・特定許可・契約条項入力</h2>
+          <div class="preset-actions">
+            <button type="button" id="btn-sample-bad" class="btn-secondary" data-ui="btn">労務費割れ・価格転嫁拒否例</button>
+            <button type="button" id="btn-sample-good" class="btn-secondary" data-ui="btn">改正建設業法 準拠例</button>
+          </div>
+        </div>
+
+        <div class="meta-grid">
+          <label>
+            発注者 / 元請事業者名
+            <input id="in-org" type="text" value="武蔵ビルドエンジニアリング株式会社" />
+          </label>
+          <label>
+            工事名称 / 発注案件名
+            <input id="in-project" type="text" value="さいたま物流倉庫 第2期空調配管工事" />
+          </label>
+        </div>
+
+        <div class="meta-grid-3">
+          <label>
+            請負代金額 (JPY)
+            <input id="in-contract-amt" type="number" min="0" step="100000" value="18000000" />
+          </label>
+          <label>
+            標準労務費+法定福利費目安 (JPY)
+            <input id="in-labor-floor" type="number" min="0" step="100000" value="19500000" />
+          </label>
+          <label>
+            下請契約発注総額 (JPY)
+            <input id="in-subcontract" type="number" min="0" step="1000000" value="55000000" />
+          </label>
+        </div>
+
+        <div class="meta-grid-3">
+          <label>
+            工事種別区分（特定許可閾値）
+            <select id="in-ctype">
+              <option value="general">一般工事業種 (閾値 5,000万円)</option>
+              <option value="architectural_general">建築一式工事 (閾値 8,000万円)</option>
+            </select>
+          </label>
+          <label>
+            単月時間外+休日労働 (h)
+            <input id="in-month-ot" type="number" min="0" step="1" value="105" />
+          </label>
+          <label>
+            2〜6ヶ月平均残業時間 (h)
+            <input id="in-avg-ot" type="number" min="0" step="1" value="84" />
+          </label>
+        </div>
+
+        <div class="check-row">
+          <label class="inline-check">
+            <input id="in-tokutei" type="checkbox" />
+            <span>元請会社として「特定建設業許可」を保有・専任監理技術者を配置可能</span>
+          </label>
+        </div>
+
+        <label class="field-block">
+          下請注文書・基本契約約款・価格変更協議特約テキスト
+          <textarea id="in-contract" rows="9" placeholder="建設業法第19条法16項目、標準労務費・法定福利費内訳、資材高騰おそれ情報通知・変更協議、4週8休・著しく短い工期禁止、第22条一括下請負禁止、50日支払、主任技術者配置、帳簿5年保存を入力..."></textarea>
+        </label>
+
+        <div class="run-bar">
+          <button type="button" id="btn-audit" class="btn-primary" data-ui="btn">建設業法・労務費・工期監査を実行</button>
+        </div>
+      </section>
+
+      <section class="panel output-panel" data-ui="panel">
+        <div class="panel-head">
+          <h2>2. 法令適合スコア・許可閾値・リスク詳細</h2>
+          <div id="status-badge" class="score-pill" data-ui="score-pill">未診断</div>
+        </div>
+
+        <div class="summary-strip" data-ui="summary-strip">
+          <div class="metric-cell" data-ui="metric">
+            <span class="metric-label">改正建設業法スコア</span>
+            <strong id="m-score" class="metric-val">—</strong>
+          </div>
+          <div class="metric-cell" data-ui="metric">
+            <span class="metric-label">特定許可 / 労務費</span>
+            <strong id="m-thresh" class="metric-val">—</strong>
+          </div>
+          <div class="metric-cell" data-ui="metric">
+            <span class="metric-label">2024年残業上限</span>
+            <strong id="m-ot" class="metric-val">—</strong>
+          </div>
+        </div>
+
+        <h3>検出された改正建設業法・時間外上限上の課題</h3>
+        <div id="findings-list" class="findings-list"></div>
+
+        <div class="draft-head">
+          <h3>自動生成『改正建設業法・2024年上限 監査証明書』Markdown</h3>
+          <div class="draft-actions">
+            <button type="button" id="btn-copy-md" class="btn-secondary" data-ui="btn">Markdownをコピー</button>
+            <button type="button" id="btn-download-md" class="btn-secondary" data-ui="btn">.md 保存</button>
+          </div>
+        </div>
+        <pre id="md-output" class="code-box"><code></code></pre>
+      </section>
+    </main>
+
+    <footer class="site-footer" data-ui="footer">
+      <p>KENSETSUGATE 建設門 — Horizon-Money Studio Track 2（完全クライアントサイド実行・通信ゼロ・改正建設業法自己点検ツール）</p>
+    </footer>
+  </div>
+
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>
